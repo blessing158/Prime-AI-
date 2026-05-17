@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PRIME AI vFULL</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* HEADER */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 55px;
+  background: #0a0a0a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  border-bottom: 1px solid #222;
+}
+
+.logo {
+  color: #00ffe5;
+  font-weight: bold;
+}
+
+.menu {
+  cursor: pointer;
+  font-size: 22px;
+}
+
+/* CHAT */
+#chat {
+  position: absolute;
+  top: 55px;
+  bottom: 60px;
+  width: 100%;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.msg {
+  max-width: 80%;
+  margin: 8px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.user {
+  background: #1e1e1e;
+  margin-left: auto;
+}
+
+.ai {
+  background: #003b3b;
+  margin-right: auto;
+}
+
+/* INPUT */
+#inputBar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  padding: 8px;
+  background: #0a0a0a;
+  border-top: 1px solid #222;
+}
+
+#text {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  background: #1a1a1a;
+  color: white;
+}
+
+button {
+  width: 45px;
+  height: 45px;
+  margin-left: 8px;
+  border-radius: 50%;
+  border: none;
+  background: #00ffe5;
+  cursor: pointer;
+}
+
+/* MENU */
+#menu {
+  position: fixed;
+  top: 55px;
+  right: 10px;
+  width: 240px;
+  background: #111;
+  border: 1px solid #333;
+  display: none;
+  flex-direction: column;
+  z-index: 10;
+}
+
+#menu button {
+  width: 100%;
+  background: transparent;
+  color: white;
+  padding: 10px;
+  border-bottom: 1px solid #222;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">PRIME AI vFULL</div>
+  <div class="menu" onclick="toggleMenu()">⋮</div>
+</header>
+
+<!-- MENU -->
+<div id="menu">
+  <button onclick="about()">About PRIME</button>
+  <button onclick="clearChat()">Clear Chat</button>
+  <button onclick="resetMemory()">Reset Memory</button>
+</div>
+
+<!-- CHAT -->
+<div id="chat"></div>
+
+<!-- INPUT -->
+<div id="inputBar">
+  <input id="text" placeholder="Message PRIME..." />
+  <button onclick="send()">➤</button>
+</div>
+
+<script>
+
+/* ================= MEMORY SYSTEM ================= */
+let memory = JSON.parse(localStorage.getItem("prime_memory") || "[]");
+
+function saveMemory(){
+  localStorage.setItem("prime_memory", JSON.stringify(memory));
+}
+
+/* ================= MENU ================= */
+function toggleMenu(){
+  let m=document.getElementById("menu");
+  m.style.display = m.style.display === "flex" ? "none" : "flex";
+}
+
+/* ================= CHAT ================= */
+function addMsg(text,type){
+  let d=document.createElement("div");
+  d.className="msg "+type;
+  d.innerText=text;
+  document.getElementById("chat").appendChild(d);
+  document.getElementById("chat").scrollTop=999999;
+}
+
+/* LOAD OLD MEMORY ON START */
+window.onload = () => {
+  memory.forEach(m => addMsg(m.text, m.type));
+};
+
+/* ================= SEND ================= */
+function send(){
+  let i=document.getElementById("text");
+  if(!i.value) return;
+
+  let msg=i.value;
+  i.value="";
+
+  addMsg(msg,"user");
+
+  memory.push({type:"user",text:msg});
+  saveMemory();
+
+  setTimeout(()=>{
+    let res = brain(msg);
+
+    addMsg(res,"ai");
+
+    memory.push({type:"ai",text:res});
+    saveMemory();
+  },400);
+}
+
+/* ================= AI BRAIN ================= */
+function brain(m){
+  m = m.toLowerCase();
+
+  // basic intelligence layer
+  if(m.includes("hello")) return "PRIME: Hello, I am active.";
+  if(m.includes("who are you")) return "PRIME: I am PRIME, an offline adaptive AI system.";
+  if(m.includes("what is your name")) return "PRIME: My name is PRIME.";
+  if(m.includes("memory")) return "PRIME: I can now store conversations locally.";
+  if(m.includes("what can you do")) return "PRIME: I process text, store memory, and respond dynamically.";
+
+  // adaptive behavior using memory pattern
+  if(memory.length > 10){
+    return "PRIME: I am learning from your interaction patterns...";
+  }
+
+  return "PRIME: Processing input through offline logic engine...";
+}
+
+/* ================= ABOUT ================= */
+function about(){
+  alert(
+`PRIME AI vFULL SYSTEM
+
+TYPE: Offline Adaptive AI Framework
+CREATOR: Blessing Masedi
+YEAR: 2026
+
+FEATURES:
+- Chat AI interface
+- Local memory system (persistent storage)
+- Adaptive response logic
+- Expandable architecture for upgrades
+- No external API dependency
+
+STATUS: Core Engine Complete`
+  );
+}
+
+/* ================= CLEAR CHAT ================= */
+function clearChat(){
+  document.getElementById("chat").innerHTML="";
+}
+
+/* ================= RESET MEMORY ================= */
+function resetMemory(){
+  memory = [];
+  localStorage.removeItem("prime_memory");
+  clearChat();
+  alert("PRIME: Memory reset complete");
+}
+
+</script>
+
+</body>
+</html>
